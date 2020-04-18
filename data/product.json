@@ -1,0 +1,73 @@
+{
+  "product": [
+    {
+      "id": 1,
+      "images": [
+        {
+          "url": "https://picsum.photos/200/300"
+        }
+      ],
+      "name": "Demo1",
+      "price": "500000",
+      "categories": [1,2]
+    },
+    {
+      "id": 2,
+      "images": [
+        {
+          "url": "https://picsum.photos/200/300"
+        }
+      ],
+      "name": "Demo2",
+      "price": "500000",
+      "categories": [2]
+    },
+    {
+      "id": 3,
+      "images": [
+        {
+          "url": "https://picsum.photos/200/300"
+        }
+      ],
+      "name": "Demo3",
+      "price": "500000",
+      "categories": [3,1]
+    },
+    {
+      "id": 4,
+      "images": [
+        {
+          "url": "https://picsum.photos/200/300"
+        }
+      ],
+      "name": "Demo4",
+      "price": "500000",
+      "categories": [1]
+    },
+    {
+      "id": 5,
+      "images": [
+        {
+          "url": "https://picsum.photos/200/300"
+        }
+      ],
+      "name": "Demo5",
+      "price": "500000",
+      "categories": [2,3]
+    }
+  ],
+  "categories": [
+    {
+      "id": 1,
+      "name": "Work Shopping"
+    },
+    {
+      "id": 2,
+      "name": "Learn React"
+    },
+    {
+      "id": 3,
+      "name": "Learn Nodejs"
+    }
+  ]
+}
