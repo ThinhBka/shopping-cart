@@ -14,6 +14,7 @@ import {
 } from 'react-native';
 import axios from 'axios';
 
+
 export default class LoginScreen extends React.Component{
   constructor(props){
     super(props);
@@ -30,7 +31,7 @@ export default class LoginScreen extends React.Component{
   componentDidMount = async () =>{
     const { navigation } = this.props;
     const token = await AsyncStorage.getItem('token');
-    if(token){
+    if(!token){
       // check token
       const res = await axios.get('/checkToken',{
         headers: {
@@ -38,8 +39,14 @@ export default class LoginScreen extends React.Component{
           'Authorization': token
         }
       })
-      if(res.data){
+
+      if(res.data.userId && res.status === 200){
+        await AsyncStorage.setItem('userId', res.data.userId);
         return navigation.navigate('Home');
+      }else{
+        await AsyncStorage.removeItem('token');
+        const res = await axios.get('/api/users');
+        await this.promisedSetState({ data: res.data });
       }
     }else{
       try {
@@ -58,7 +65,6 @@ export default class LoginScreen extends React.Component{
       });
     });
   }
-
 
   handleLogin = async () => {
     const { navigation } = this.props;

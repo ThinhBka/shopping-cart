@@ -39,7 +39,6 @@ export default class Categories extends React.Component {
           onError={console.warn}
         />
     ); }
-    console.log(categories);
     return (
       <SafeAreaView>
         <FlatList 

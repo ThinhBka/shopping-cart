@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    order: {
+      type: Array,
+      required: false
+    }
 })
 
 module.exports = mongoose.model('users', userSchema);

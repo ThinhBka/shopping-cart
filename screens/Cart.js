@@ -1,15 +1,79 @@
 import React from 'react';
-import { View, Text, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Dimensions } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert, AsyncStorage } from 'react-native';
 import { ShopContext } from '../context/context';
 import CartListItem from '../components/CartListItem';
+import axios from 'axios';
+
 
 export default class CartScreen extends React.Component{
+
+  state = {
+    order: []
+  }
+
+  componentDidMount = async () => {
+    const { navigation } = this.props
+    const userId = await AsyncStorage.getItem('userId');
+    const res = await axios.get('/order')
+    const idx = res.data.findIndex(item => item._id === userId);
+    if(idx === -1){
+      return navigation.navigate('Login');
+    }
+    await this.promisedSetState({ order: res.data[idx].order})
+  }
+
+  handleBuy = async (cartItems) => {
+    if(cartItems.length > 0){
+      const { navigation } = this.props;
+      const userId = await AsyncStorage.getItem('userId');
+      // recomend nên update trong componenDidUpdate
+      const res = await axios.get('/order')
+      const idx = res.data.findIndex(item => item._id === userId);
+      if(idx === -1){
+        return navigation.navigate('Login');
+      }
+      await this.promisedSetState({ order: res.data[idx].order})
+      const { order } = this.state;
+      const orders = [...order, {[Date.now()]: cartItems}];
+      const token = await AsyncStorage.getItem('token');
+      // check mua token het han yeu cau dang nhap lai
+      // if(!token){
+      //   return navigation.navigate('Login');
+      // }
+      // const res = await axios.get('/checkToken',{
+      //   headers: {
+      //     'Content-Type': 'application/x-www-form-urlencoded',
+      //     'Authorization': token
+      //   }
+      // })
+      // const userId = res.data.userId;
+      if(!userId){
+        return navigation.navigate('Login');
+      }
+  
+      await axios.post('/order',{
+        'id': userId,
+        'order': orders
+      })
+      Alert.alert('Thanks You', 'Bạn mua hàng thành công!')
+    }
+    Alert.alert('Bạn có biết ? ', 'Bạn chưa mua gì? =))')
+  }
+
+  promisedSetState = (newState) => {
+    return new Promise((resolve) => {
+      this.setState(newState, () => {
+        resolve('Done')
+      });
+    });
+  }
+
   render(){
     const windowHeight = Dimensions.get('window').height;
     return(
       <SafeAreaView>
         <ShopContext.Consumer>
-          {({ cartItems, addToCart, removeFromCart, getTotal, toTalCost }) => (
+          {({ cartItems, addToCart, removeFromCart, resetBuy, toTalCost }) => (
             <View style={{height: 553}}>
               {cartItems.length > 0 ? (
               <FlatList 
@@ -27,7 +91,7 @@ export default class CartScreen extends React.Component{
                   <Text style={styles.total}>Tổng:</Text>
                   <Text style={styles.cost}>{toTalCost === '' ? '0K' : toTalCost}</Text>
                 </View>
-                <TouchableOpacity style={styles.buyBorder} onPress={() => console.log('Mua hang')}>
+                <TouchableOpacity style={styles.buyBorder} onPress={() => {this.handleBuy(cartItems); resetBuy()}}>
                   <Text style={styles.buy}>ĐẶT HÀNG</Text>
                 </TouchableOpacity>
               </View>

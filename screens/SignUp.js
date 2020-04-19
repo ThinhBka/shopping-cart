@@ -7,6 +7,7 @@ import {
   TextInput,
   AsyncStorage,
   TouchableHighlight,
+  ActivityIndicator,
   Image
 } from 'react-native';
 import axios from 'axios'
@@ -19,7 +20,8 @@ export default class SignUpScreen extends React.Component{
       password: '',
       againPassword: '',
       errors: [],
-      data:[]
+      data:[],
+      loading: false
     }
   }
   componentDidMount = async () => {
@@ -29,30 +31,39 @@ export default class SignUpScreen extends React.Component{
     const { navigation } = this.props;
     const { username, password, againPassword } = this.state;
     const errors = [];
-
+    this.setState({ loading: true})
     if(password !== againPassword){
       errors.push('password');
     }
-    this.setState({
-      errors
-    })
+    const T1 = setTimeout(() => {
+      this.setState({
+        loading: false,
+        errors
+      })
+    }, 2000)
     setTimeout(() => {
+      if(T1){
+        clearTimeout(T1);
+      }
       this.setState({
         errors: []
       })
-    },2000)
+    }, 4000)
+
     if(!errors.length){
       const res = await axios.post('/check/register', {
         'username': username,
         'password': password
       })
       if(res.status === 200){
-        return navigation.navigate('Login');
+        this.setState({loading: false}, () => {
+          return navigation.navigate('Login');
+        }) 
       }
     }
   }
   render(){
-    const { errors } = this.state;
+    const { errors, loading } = this.state;
     return(
       <SafeAreaView style={styles.container}>
         <Text style={styles.SignUp}>Sign Up</Text>
@@ -64,7 +75,14 @@ export default class SignUpScreen extends React.Component{
               underlineColorAndroid='transparent'
               onChangeText={(username) => this.setState({username})}/>
         </View>
-        
+        {
+          loading ? (
+            <>
+              <View style={styles.background}></View>
+              <View style={styles.spinner}><ActivityIndicator size="large" color="#0000ff" /></View>
+            </>
+          ) : null
+        }
         <View style={styles.inputContainer}>
           <Image style={styles.inputIcon} source={{uri: 'https://img.icons8.com/ios-filled/50/000000/key.png'}}/>
           <TextInput style={styles.inputs}
@@ -105,6 +123,20 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 130,
   },
+  spinner: {
+    position: 'absolute',
+    zIndex: 14,
+    top: 250
+  },
+  background: {
+    backgroundColor: '#eee',
+    position: 'absolute',
+    zIndex:1,
+    opacity: .6,
+    width: 500,
+    top: 0,
+    height: 600
+  },  
   SignUp: {
     textAlign: 'center',
     fontWeight: '600',

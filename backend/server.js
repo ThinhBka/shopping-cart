@@ -1,8 +1,8 @@
 // app.js
 require('dotenv').config();
 // require dependencies
-const bodyParser = require('body-parser');
 const app = require('express')();
+const bodyParser = require('body-parser');
 const cors = require('cors')
 const mongoose = require('mongoose');
 const User = require('./models/user.model');
@@ -12,6 +12,7 @@ const authLoginRoute = require('./router/auth.router');
 const forgotRoute = require('./router/forgot.router');
 const checkTokenRoute = require('./router/checkToken.route');
 const userRoute = require('./api/user');
+const orderRoute = require('./router/order.route');
 
 // mongo key
 const mongoURI = `mongodb+srv://Product:giadinhlaso1@cluster0-kvgbc.mongodb.net/shop?retryWrites=true&w=majority`;
@@ -41,5 +42,7 @@ app.use('/forgotPassword', forgotRoute)
 app.use('/api/products', productRoute);
 app.use('/api/categories', categoryRoute);
 app.use('/api/users', userRoute);
+
+app.use('/order', orderRoute)
 
 app.listen(9080, () => console.log('Server is starting'));
