@@ -7,6 +7,8 @@ import StackNavigator from './StackNavigator';
 import CartScreen from '../screens/Cart';
 import SettingsScreen from '../screens/Settings';
 import OrderScreen from '../screens/Order';
+import LoginScreen from '../screens/Login';
+import SignUpScreen from '../screens/SignUp';
 import { formatToTal } from '../helper/uils';
 import { ShopContext } from '../context/context';
 
@@ -34,9 +36,17 @@ const SettingStackScreen = () => (
   </SettingStack.Navigator>
 )
 
+const LoginStack = createStackNavigator();
+const LoginStackScreen = () => (
+  <LoginStack.Navigator>
+    <LoginStack.Screen name="Login" component={LoginScreen} options={{ title: '' }}/>
+    <LoginStack.Screen name="SignUp" component={SignUpScreen} options={{ title: '' }}/>
+  </LoginStack.Navigator>
+)
+
 const Tab = createBottomTabNavigator();
 
-export default function TabNaviagtor(){
+const TabNavigator = () => {
   return(
     <ShopContext.Consumer>
       {({ total }) => (
@@ -103,4 +113,8 @@ const IconWithBadge = ({ name, badgeCount, color, size }) => {
       )}
     </View>
   );
+}
+export {
+  LoginStackScreen,
+  TabNavigator
 }

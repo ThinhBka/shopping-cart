@@ -19,8 +19,9 @@ export class Provider extends React.Component{
   }
   addToCart = product => {
     let { cartItems } = this.state;
+    console.log(product , cartItems);
     let newData = [];
-    const idx = cartItems.findIndex(item => item.id === product.id);
+    const idx = cartItems.findIndex(item => item._id === product._id);
     if(idx !== -1){
       newData = {...cartItems[idx], quality: cartItems[idx].quality+1}
       cartItems[idx] = newData;
@@ -36,7 +37,7 @@ export class Provider extends React.Component{
   removeFromCart = product => {
     let { cartItems } = this.state;
     let newData = [];
-    const idx = cartItems.findIndex(item => item.id === product.id);
+    const idx = cartItems.findIndex(item => item._id === product._id);
     if(product.quality > 1){
       newData = {...product, quality: product.quality - 1}
       cartItems[idx] = newData;

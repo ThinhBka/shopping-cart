@@ -29,7 +29,7 @@ export default class Category extends React.Component {
   }
   componentDidMount(){
     const { route } = this.props;
-    axios.get(`/product`)
+    axios.get(`/api/products`)
       .then(res => 
         {
           let data1 = [];
@@ -46,7 +46,6 @@ export default class Category extends React.Component {
 
   render(){
     const { product } = this.state;
-    const { navigation } = this.props;
     if (!this.state.isReady) {
       return (
         <View style={[styles.loading]}>

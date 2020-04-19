@@ -21,7 +21,7 @@ export default function AppNavigator(){
     <Stack.Navigator>
       <Stack.Screen name="Categories" component={CategoriesScreen} options={{ title: 'Home' }}/>
       <Stack.Screen 
-        name="Category" 
+        name="Category"
         component={CategoryScreen} 
         initialParams={{ title: 'test' }} 
         options={({ route }) => ({ 

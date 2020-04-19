@@ -14,21 +14,11 @@ export default class Categories extends React.Component {
     }
   }
   componentDidMount(){
-    // const authOptions = {
-    //   method: 'POST',
-    //   url: 'http://10.254.147.184:7777/auth/oauth/token',
-    //   data: qs.stringify(data),
-    //   headers: {
-    //       'Authorization': token,
-    //       'Content-Type': 'application/x-www-form-urlencoded'
-    //   },
-    //   json: true
-    // };
-    // axios(authOptions);
-    axios.get('/categories')
+    axios.get('/api/categories')
       .then(res => this.setState({categories: res.data, loadding: false}))
       .catch(err => console.error(err))
   }
+
   async _cacheResourcesAsync() {
     const images = [require('../assets/Group.png')];
 
@@ -49,12 +39,13 @@ export default class Categories extends React.Component {
           onError={console.warn}
         />
     ); }
+    console.log(categories);
     return (
       <SafeAreaView>
         <FlatList 
           data={categories} 
-          renderItem={ ({item}) => <Category category={item} onPress={() => navigation.navigate('Category', { title: item.name, product: item.id })}/>}
-          keyExtractor ={item => `${item.id}`}
+          renderItem={ ({item}) => <Category category={item} onPress={() => navigation.navigate('Category', { title: item.name, product: item._id })}/>}
+          keyExtractor ={item => `${item._id}`}
           contentContainerStyle={styles.container}
         />
       </SafeAreaView>
