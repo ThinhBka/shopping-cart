@@ -25,6 +25,7 @@ const checkToken = (req, res, next) => {
 
 const protectedRoute = (req, res, next) => {
   // Nếu req.user tồn tại nghĩa là token cũng tồn tại
+  console.log(req.user);
   if(req.user) {        
       return next();
   } 

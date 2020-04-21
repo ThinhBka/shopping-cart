@@ -3,6 +3,7 @@ import { StyleSheet, Text, View, FlatList, SafeAreaView, ActivityIndicator } fro
 import axios from 'axios';
 import Product from '../components/ProductListIem';
 import { ShopContext } from '../context/context'
+import { SearchBar } from 'react-native-elements';
 
 export default class Category extends React.Component {
   /**
@@ -24,9 +25,18 @@ export default class Category extends React.Component {
     super(props);
     this.state = {
       product: [],
-      isReady: false
+      dataSearch: [],
+      isReady: false,
+      search: ''
     }
   }
+
+  updateSearch = search => {
+    const { product } = this.state;
+    const data = product.filter(item => item.name.toLowerCase().includes(search.toLowerCase()));
+    this.setState({ search, dataSearch: data });
+  };
+
   componentDidMount(){
     const { route } = this.props;
     axios.get(`/api/products`)
@@ -39,13 +49,13 @@ export default class Category extends React.Component {
               data1.push(key)
             }
           }
-          this.setState({product: data1, isReady: true})
+          this.setState({product: data1, isReady: true, dataSearch: data1})
         })
       .catch(err => console.error(err))
   }
 
   render(){
-    const { product } = this.state;
+    const { search, dataSearch } = this.state;
     if (!this.state.isReady) {
       return (
         <View style={[styles.loading]}>
@@ -55,8 +65,13 @@ export default class Category extends React.Component {
 
     return (
       <SafeAreaView>
+        <SearchBar
+          placeholder="Type Here..."
+          onChangeText={this.updateSearch}
+          value={search}
+        />
         <FlatList 
-          data={product}
+          data={dataSearch}
           numColumns={2}
           renderItem={ ({item}) => (
           <View style={styles.wrapper}>

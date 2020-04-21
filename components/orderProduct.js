@@ -14,18 +14,22 @@ import { formatPrice } from '../helper/uils';
 export default function OrderProduct(props){
   const { product } = props;
   return(
-    <View style={styles.container}>
-      <Image style={styles.img} source={{ uri: product.images[0].url }}/>
-      <View style={styles.info}>
-        <View style={styles.priceRow}>
-          <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.price}>{formatPrice(product.price)}</Text>
-        </View>
-        <View style={styles.controll}>
-          <Text>{product.quality}</Text>
+    <>
+    {product ? (
+      <View style={styles.container}>
+        <Image style={styles.img} source={{ uri: product.images[0].url }}/>
+        <View style={styles.info}>
+          <View style={styles.priceRow}>
+            <Text style={styles.name}>{product.name}</Text>
+            <Text style={styles.price}>{formatPrice(product.price)}</Text>
+          </View>
+          <View style={styles.controll}>
+            <Text>{product.quality}</Text>
+          </View>
         </View>
       </View>
-    </View>
+    ): null}
+    </>
   )
 }
 

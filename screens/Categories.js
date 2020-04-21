@@ -14,11 +14,24 @@ export default class Categories extends React.Component {
     }
   }
   componentDidMount(){
+    const { navigation } = this.props;
     axios.get('/api/categories')
       .then(res => this.setState({categories: res.data, loadding: false}))
       .catch(err => console.error(err))
+
+    // use state when This event is emitted when the navigator's state changes (chuyển màn hình auto: login -> home) : state, focus, blur
+    this._unsubscribe = navigation.addListener('state', async () => {
+      await axios.get('/api/categories')
+        .then(res => this.setState({categories: res.data, loadding: false}))
+        .catch(err => console.error(err))
+    })
   }
 
+  componentWillUnmount(){
+    this._unsubscribe();
+  }
+
+  // check ảnh được load hết
   async _cacheResourcesAsync() {
     const images = [require('../assets/Group.png')];
 

@@ -8,7 +8,8 @@ export const ShopContext = React.createContext({
   cartItems: [],
   addToCart: product => {},
   removeFromCart: product => {},
-  getTotal: () => {}
+  getTotal: () => {},
+  resetBuy: () => {}
 })
 
 export class Provider extends React.Component{
@@ -19,7 +20,6 @@ export class Provider extends React.Component{
   }
   addToCart = product => {
     let { cartItems } = this.state;
-    console.log(product , cartItems);
     let newData = [];
     const idx = cartItems.findIndex(item => item._id === product._id);
     if(idx !== -1){
@@ -60,6 +60,15 @@ export class Provider extends React.Component{
       })
     }
   }
+
+  resetBuy = () => {
+    this.setState({
+      cartItems: [],
+      total: 0,
+      toTalCost: ''
+    })
+  }
+
   render(){
     const { cartItems, total, toTalCost } = this.state;
     return (
@@ -70,7 +79,8 @@ export class Provider extends React.Component{
           cartItems,
           addToCart: this.addToCart,
           removeFromCart: this.removeFromCart,
-          getTotal: this.getTotal
+          getTotal: this.getTotal,
+          resetBuy: this.resetBuy
         }}
       >
         {this.props.children}

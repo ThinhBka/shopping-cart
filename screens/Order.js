@@ -8,31 +8,32 @@ export default class OrderScreen extends React.Component{
     order: []
   }
 
-  componentDidMount = async () => {
+  componentDidMount = () => {
     const { navigation } = this.props
-    const userId = await AsyncStorage.getItem('userId');
-    const res = await axios.get('/order')
-    const idx = res.data.findIndex(item => item._id === userId);
-    if(idx === -1){
-      return navigation.navigate('Login');
-    }
-    await this.promisedSetState({ order: res.data[idx].order})
+    this._unsubscribe = navigation.addListener('focus', async () => {
+      const userId = await AsyncStorage.getItem('userId');
+      if(!userId){
+        return navigation.navigate('Login');
+      }
+      const res = await axios.get(`/order/${userId}`)
+      await this.promisedSetState({ order: res.data[0].order})
+    });
   }
 
-  componentDidUpdate = async (prevProps, prevState) => {
+  getSnapshotBeforeUpdate = async (prevProps, prevState) => {
     const { navigation } = this.props
     const userId = await AsyncStorage.getItem('userId');
-    const res = await axios.get('/order')
-    const idx = res.data.findIndex(item => item._id === userId);
-    if(idx === -1){
+    if(!userId){
       return navigation.navigate('Login');
     }
+    const res = await axios.get(`/order/${userId}`);
+    await this.promisedSetState({ order: res.data[0].order})
     //TODO: Fix call api
-    // if(prevState.order.length !== res.data[idx].order.length){
-      await this.promisedSetState({ order: res.data[idx].order})
-    // }
   }
 
+  componentWillUnmount(){
+    this._unsubscribe();
+  }
   promisedSetState = (newState) => {
     return new Promise((resolve) => {
       this.setState(newState, () => {
@@ -51,16 +52,16 @@ export default class OrderScreen extends React.Component{
     })
   }
   render(){
-    const { order } = this.state
+    const { order } = this.state;
     return(
       <SafeAreaView>
         <View style={{height: 553}}>
           {order.length > 0 ? (
           <FlatList 
             data={order}
-            renderItem={ ({item}) => (
+            renderItem={ ({item, index}) => (
               <View style={styles.wrapper}>
-                <OrderListItem order={item}/>
+                <OrderListItem product={item} idx={index}/>
               </View>
             )}
             keyExtractor ={item => `${Object.keys(item)[0]}`}

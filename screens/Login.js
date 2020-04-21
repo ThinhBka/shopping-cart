@@ -30,32 +30,24 @@ export default class LoginScreen extends React.Component{
 
   componentDidMount = async () =>{
     const { navigation } = this.props;
-    const token = await AsyncStorage.getItem('token');
-    if(!token){
-      // check token
-      const res = await axios.get('/checkToken',{
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': token
-        }
-      })
-
-      if(res.data.userId && res.status === 200){
-        await AsyncStorage.setItem('userId', res.data.userId);
-        return navigation.navigate('Home');
-      }else{
-        await AsyncStorage.removeItem('token');
-        const res = await axios.get('/api/users');
-        await this.promisedSetState({ data: res.data });
-      }
-    }else{
-      try {
-        const res = await axios.get('/api/users');
-        await this.promisedSetState({ data: res.data });
-      } catch (error) {
-        console.error(error)
-      }
+    try {
+      await AsyncStorage.removeItem('token');
+      await AsyncStorage.removeItem('userId');
+      const res = await axios.get('/api/users');
+      await this.promisedSetState({ data: res.data });
+    } catch (error) {
+      console.error(error)
     }
+    // this._unsubscribe = navigation.addListener('state', async () => {
+    //   try {
+    //     await AsyncStorage.removeItem('token');
+    //     await AsyncStorage.removeItem('userId');
+    //     const res = await axios.get('/api/users');
+    //     await this.promisedSetState({ data: res.data });
+    //   } catch (error) {
+    //     console.error(error)
+    //   }
+    // })
   }
 
   promisedSetState = (newState) => {
@@ -65,6 +57,10 @@ export default class LoginScreen extends React.Component{
       });
     });
   }
+
+  // componentWillUnmount(){
+  //   this._unsubscribe();
+  // }
 
   handleLogin = async () => {
     const { navigation } = this.props;
@@ -112,7 +108,7 @@ export default class LoginScreen extends React.Component{
         'password': password
       })
       await AsyncStorage.setItem('token', res.data.token);
-
+      await AsyncStorage.setItem('userId', res.data.userId);
       this.setState({ errors, loading: false }, () => {
         return navigation.navigate("Home");
       });

@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert, AsyncStorage } from 'react-native';
+import { View, Text, SafeAreaView, StyleSheet, FlatList, TouchableOpacity, Dimensions, Alert, AsyncStorage, Keyboard } from 'react-native';
 import { ShopContext } from '../context/context';
 import CartListItem from '../components/CartListItem';
 import axios from 'axios';
@@ -11,53 +11,51 @@ export default class CartScreen extends React.Component{
     order: []
   }
 
-  componentDidMount = async () => {
-    const { navigation } = this.props
+  componentDidMount = () => {
+    const { navigation } = this.props;
+    this._unsubscribe = navigation.addListener('focus', async () => {
     const userId = await AsyncStorage.getItem('userId');
-    const res = await axios.get('/order')
-    const idx = res.data.findIndex(item => item._id === userId);
-    if(idx === -1){
+    const res = await axios.get(`/order/${userId}`)
+    if(!userId){
       return navigation.navigate('Login');
     }
-    await this.promisedSetState({ order: res.data[idx].order})
+    await this.promisedSetState({ order: res.data[0].order})
+    })
+  }
+
+  componentWillUnmount(){
+    this._unsubscribe();
   }
 
   handleBuy = async (cartItems) => {
+    Keyboard.dismiss();
     if(cartItems.length > 0){
+      Alert.alert('Thanks You', 'Bạn mua hàng thành công!')
       const { navigation } = this.props;
       const userId = await AsyncStorage.getItem('userId');
-      // recomend nên update trong componenDidUpdate
-      const res = await axios.get('/order')
-      const idx = res.data.findIndex(item => item._id === userId);
-      if(idx === -1){
-        return navigation.navigate('Login');
-      }
-      await this.promisedSetState({ order: res.data[idx].order})
+      const res = await axios.get(`/order/${userId}`);
+      await this.promisedSetState({ order: res.data[0].order})
       const { order } = this.state;
       const orders = [...order, {[Date.now()]: cartItems}];
       const token = await AsyncStorage.getItem('token');
+      const res1 = await axios.get('/checkToken', {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+          'Authorization': token
+        }
+      })
       // check mua token het han yeu cau dang nhap lai
-      // if(!token){
-      //   return navigation.navigate('Login');
-      // }
-      // const res = await axios.get('/checkToken',{
-      //   headers: {
-      //     'Content-Type': 'application/x-www-form-urlencoded',
-      //     'Authorization': token
-      //   }
-      // })
-      // const userId = res.data.userId;
-      if(!userId){
+      if(!token || !res1.data.userId){
         return navigation.navigate('Login');
       }
-  
+
       await axios.post('/order',{
         'id': userId,
         'order': orders
       })
-      Alert.alert('Thanks You', 'Bạn mua hàng thành công!')
+    }else{
+      Alert.alert('Bạn có biết ? ', 'Bạn chưa mua gì? =))')
     }
-    Alert.alert('Bạn có biết ? ', 'Bạn chưa mua gì? =))')
   }
 
   promisedSetState = (newState) => {

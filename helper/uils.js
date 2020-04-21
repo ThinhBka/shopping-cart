@@ -12,6 +12,7 @@ const formatToTal = (value) => {
   }
   return value;
 }
+
 export {
   formatPrice,
   formatToTal

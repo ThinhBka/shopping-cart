@@ -4,6 +4,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  AsyncStorage,
   Alert,
   Button,
   FlatList,
@@ -11,36 +12,96 @@ import {
 } from 'react-native';
 import OrderItem from './orderProduct';
 import { formatPrice } from '../helper/uils';
+import axios from 'axios';
 
-const getTotal = (cartItems) => {
-  const result = cartItems.reduce((item, current) => item + Number(current.quality)*Number(current.price), 0);
-  return formatPrice(result);
-}
+export default class OrderListItem extends React.Component{
 
-export default function OrderListItem(props){
-  const { order } = props;
-  const date = new Date(Number(Object.keys(order)[0]));
-  const dateConvert = date.toLocaleString();
-  const data = Object.values(order)[0];
-  const cost = getTotal(data);
-  return(
-    <View style={styles.shadow}>
-      <Text style={styles.pages}>Hóa Đơn</Text>
-      <View style={styles.container}>
-        <FlatList 
-          data={data} 
-          renderItem={ ({item}) => <OrderItem product={item}/>}
-          keyExtractor ={item => `${item._id}`}
-          contentContainerStyle={styles.container}
-        />
-      </View>
-      <View style={styles.boxTotal}>
-        <Text style={styles.total}>Tổng</Text>
-        <Text style={styles.cost}>{cost}</Text>
-      </View>
-      <Text style={styles.timeBuy}>{dateConvert}</Text>
-    </View>
-  )
+  state = {
+    order: [],
+    data: [],
+    cost: 0,
+    dateConvert: ''
+  }
+
+  componentDidMount(){
+    const { product } = this.props;
+    const date = new Date(Number(Object.keys(product)[0]));
+    const dateConvert = date.toLocaleString();
+    const data = Object.values(product)[0];
+    const cost = this.getTotal(data);
+    this.setState({
+      cost,
+      data,
+      dateConvert
+    })
+  }
+
+  getTotal = (cartItems) => {
+    const result = cartItems.reduce((item, current) => item + Number(current.quality)*Number(current.price), 0);
+    return formatPrice(result);
+  }
+  
+  deleteItem = async () => {
+    try {
+      const userId = await AsyncStorage.getItem('userId');
+      if(!userId){
+        return navigation.navigate('Login');
+      }
+      const res = await axios.get(`/order/${userId}`)
+      await this.promisedSetState({ order: res.data[0].order});
+      const { product } = this.props;
+      const { order } = this.state;
+      let orders = JSON.parse(JSON.stringify(order));
+      await this.promisedSetState({ data: []})
+      const idx = orders.findIndex(item => Object.keys(product)[0] === Object.keys(item)[0])
+      const x = [...orders.slice(0, idx), ...orders.slice(idx+1)];
+      // // Update item
+      await axios.post('/order',{
+        'order': x,
+        'id': userId
+      })
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  promisedSetState = (newState) => {
+    return new Promise((resolve) => {
+      this.setState(newState, () => {
+        resolve('Done')
+      });
+    });
+  }
+
+  render(){
+    const { cost, dateConvert, data } = this.state;
+    return(
+      <>
+      {data.length > 0 ? (
+        <View style={styles.shadow}>
+          <Text style={styles.pages}>Hóa Đơn</Text>
+          <TouchableOpacity activeOpacity={0.4} onPress={this.deleteItem} style={styles.deleteBtn}>
+            <Image source={{uri: 'https://img.icons8.com/android/24/000000/trash.png'}} style={styles.iconDelete}/>
+          </TouchableOpacity>
+          
+          <View style={styles.container}>
+            <FlatList 
+              data={data} 
+              renderItem={ ({item}) => <OrderItem product={item}/>}
+              keyExtractor ={item => `${item._id}`}
+              contentContainerStyle={styles.container}
+            />
+          </View>
+          <View style={styles.boxTotal}>
+            <Text style={styles.total}>Tổng</Text>
+            <Text style={styles.cost}>{cost}</Text>
+          </View>
+          <Text style={styles.timeBuy}>{dateConvert}</Text>
+        </View>
+      ): null}
+      </>
+    )
+  }
 }
 
 const styles = StyleSheet.create({
@@ -53,6 +114,16 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingTop: 25,
     paddingBottom: 80
+  },
+  deleteBtn: {
+    position: 'absolute',
+    zIndex: 20,
+    right: 16,
+    top: 20
+  },
+  iconDelete: {
+    width: 25,
+    height: 25
   },
   pages: {
     color: '#ddd',

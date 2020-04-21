@@ -1,6 +1,7 @@
 import React from 'react';
 import { Image, Button } from 'react-native';
 import { createStackNavigator } from '@react-navigation/stack';
+import Icon from 'react-native-vector-icons/FontAwesome';
 import CategoriesScreen from '../screens/Categories';
 import CategoryScreen from '../screens/Category';
 
@@ -33,13 +34,14 @@ export default function AppNavigator(){
           headerTintColor: '#fff',
           headerTitleStyle: {
             fontWeight: 'bold',
+            fontSize: 14
           },
           headerRight: () => (
-            <Button
-              onPress={() => alert('This is a button!')}
-              title="Info"
-              color="#fff"
-            />
+          <Icon
+            name='align-justify'
+            size={24}
+            color='white'
+          />
           ),
         })}/>
     </Stack.Navigator>

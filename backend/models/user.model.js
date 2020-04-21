@@ -13,6 +13,10 @@ const userSchema = new mongoose.Schema({
     order: {
       type: Array,
       required: false
+    },
+    info: {
+      type: Object,
+      required: false
     }
 })
 
