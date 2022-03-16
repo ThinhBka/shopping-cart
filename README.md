@@ -5,12 +5,7 @@ The header bar will automatically show a back button, but you can programmatical
 You can go back to an existing screen in the stack with navigation.navigate('RouteName'), and you can go back to the first screen in the stack with navigation.popToTop().
 The navigation prop is available to all screen components (components defined as screens in route configuration and rendered by React Navigation as a route).
 
-Sub: 
-  Navigation.navigate ('RouteName') đẩy một tuyến mới đến trình điều hướng ngăn xếp nếu nó chưa có trong ngăn xếp, nếu không nó sẽ nhảy đến màn hình đó.
-  Navigation.push ('RouteName') bao nhiêu lần tùy thích và nó sẽ tiếp tục đẩy các tuyến đường.
-  Thanh tiêu đề sẽ tự động hiển thị nút quay lại, nhưng bạn có thể lập trình quay lại bằng cách gọi navigation.goBack (). Trên Android, nút quay lại phần cứng chỉ hoạt động như mong đợi.
-  Bạn có thể quay lại màn hình hiện có trong ngăn xếp với navigation.navigate ('RouteName') và bạn có thể quay lại màn hình đầu tiên trong ngăn xếp với navigation.popToTop ().
-  Hỗ trợ điều hướng có sẵn cho tất cả các thành phần màn hình (các thành phần được xác định là màn hình trong cấu hình tuyến đường và được React Navigation hiển thị dưới dạng tuyến đường).
+
 
 
 2. Params
